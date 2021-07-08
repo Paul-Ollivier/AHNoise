@@ -61,6 +61,7 @@
 		96756D661D4B70A300A51F68 /* Modifiers.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96756D361D4B70A300A51F68 /* Modifiers.metal */; };
 		96756D671D4B70A300A51F68 /* Selectors.metal in Sources */ = {isa = PBXBuildFile; fileRef = 96756D371D4B70A300A51F68 /* Selectors.metal */; };
 		96756D681D4B70A300A51F68 /* UIImage+AHNoise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96756D381D4B70A300A51F68 /* UIImage+AHNoise.swift */; };
+		E215D9A826972D6D003E0734 /* MTLCommandEncoderExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E215D9A726972D6D003E0734 /* MTLCommandEncoderExtension.swift */; };
 		E220081E2696E64A003B9241 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = E220081D2696E64A003B9241 /* Types.swift */; };
 /* End PBXBuildFile section */
 
@@ -121,6 +122,7 @@
 		96756D361D4B70A300A51F68 /* Modifiers.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Modifiers.metal; path = AHNoise/Modifiers.metal; sourceTree = SOURCE_ROOT; };
 		96756D371D4B70A300A51F68 /* Selectors.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; name = Selectors.metal; path = AHNoise/Selectors.metal; sourceTree = SOURCE_ROOT; };
 		96756D381D4B70A300A51F68 /* UIImage+AHNoise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "UIImage+AHNoise.swift"; path = "AHNoise/UIImage+AHNoise.swift"; sourceTree = SOURCE_ROOT; };
+		E215D9A726972D6D003E0734 /* MTLCommandEncoderExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTLCommandEncoderExtension.swift; sourceTree = "<group>"; };
 		E220081D2696E64A003B9241 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -169,6 +171,7 @@
 		96275AF11D00AC77004BAB53 /* AHNoise */ = {
 			isa = PBXGroup;
 			children = (
+				E215D9A726972D6D003E0734 /* MTLCommandEncoderExtension.swift */,
 				E220081D2696E64A003B9241 /* Types.swift */,
 				96756D091D4B70A300A51F68 /* AHNCombiner.swift */,
 				96756D0A1D4B70A300A51F68 /* AHNCombinerAdd.swift */,
@@ -332,6 +335,7 @@
 				96756D431D4B70A300A51F68 /* AHNGeneratorBillow.swift in Sources */,
 				96756D491D4B70A300A51F68 /* AHNGeneratorGradientLinear.swift in Sources */,
 				96756D661D4B70A300A51F68 /* Modifiers.metal in Sources */,
+				E215D9A826972D6D003E0734 /* MTLCommandEncoderExtension.swift in Sources */,
 				96756D681D4B70A300A51F68 /* UIImage+AHNoise.swift in Sources */,
 				96756D461D4B70A300A51F68 /* AHNGeneratorConstant.swift in Sources */,
 				96756D611D4B70A300A51F68 /* AHNSelectorBlend.swift in Sources */,
