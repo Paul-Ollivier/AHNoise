@@ -9,7 +9,7 @@
 
 import UIKit
 import Metal
-import simd
+
 
 
 /**
@@ -164,15 +164,15 @@ open class AHNModifierColour: AHNModifier {
     var blue: CGFloat = 0
     var alpha: CGFloat = 0
     
-    // Convert UIColours to vector_float4
-    var uniformsColours: [vector_float4] = []
+    // Convert UIColours to Float4
+    var uniformsColours: [Float4] = []
     for colour in _colours{
       colour.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-      uniformsColours.append(vector_float4(Float(red), Float(green), Float(blue), Float(alpha)))
+      uniformsColours.append(Float4(Float(red), Float(green), Float(blue), Float(alpha)))
     }
     
     // Create colour buffer and copy data
-    var bufferSize = MemoryLayout<vector_float4>.stride * _colours.count
+    var bufferSize = MemoryLayout<Float4>.stride * _colours.count
     if uniformBuffer == nil || uniformBuffer?.length != bufferSize{
       uniformBuffer = context.device.makeBuffer(length: bufferSize, options: MTLResourceOptions())
     }

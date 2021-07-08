@@ -8,7 +8,7 @@
 
 
 import Metal
-import simd
+
 
 
 ///The struct used to encode user defined properties (uniforms) to the GPU.

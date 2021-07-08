@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import simd
+
 
 
 ///Generates a texture representing a slice through a field of alternating black and white cubes.

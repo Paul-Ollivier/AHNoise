@@ -8,7 +8,7 @@
 
 
 import Metal
-import simd
+
 
 
 ///Generates cohesive ridges, useful as height maps for mountainous regions. The noise created lies within the range `0.0 - 1.0`.

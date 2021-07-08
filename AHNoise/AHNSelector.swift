@@ -8,7 +8,7 @@
 
 
 import Metal
-import simd
+
 
 
 /**
@@ -16,7 +16,7 @@ import simd
  
  *Conforms to the `AHNTextureProvider` protocol.*
  */
-open class AHNSelector: NSObject, AHNTextureProvider{
+open class AHNSelector: NSObject, AHNTextureProvider {
   
   
   // MARK:- Properties
@@ -220,46 +220,48 @@ open class AHNSelector: NSObject, AHNTextureProvider{
   
   
   
-  // MARK:- Texture Functions
-  
-  
-  /**
-   Updates the output `MTLTexture`.
-   
-   This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current `AHNTextureProvider` properties.
-   */
-  open func updateTexture(){
-    guard let provider1 = provider?.texture(), let provider2 = provider2?.texture(), let selector = selector?.texture() else { return }
-    
-    // Create the internalTexture if it equals nil or is the wrong size.
-    if internalTexture == nil{
-      newInternalTexture()
+    // MARK:- Texture Functions
+
+
+    /**
+    Updates the output `MTLTexture`.
+
+    This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current `AHNTextureProvider` properties.
+    */
+    open func updateTexture() {
+        
+        guard let provider1 = provider?.texture(), let provider2 = provider2?.texture(), let selector = selector?.texture() else { return }
+
+        // Create the internalTexture if it equals nil or is the wrong size.
+        if internalTexture == nil {
+            newInternalTexture()
+        }
+        
+        if internalTexture!.width != textureWidth || internalTexture!.height != textureHeight {
+            newInternalTexture()
+        }
+
+        let threadGroupsCount = MTLSizeMake(8, 8, 1)
+        let threadGroups = MTLSizeMake(textureWidth / threadGroupsCount.width, textureHeight / threadGroupsCount.height, 1)
+
+        if let commandBuffer = context.commandQueue.makeCommandBuffer(),
+        let commandEncoder = commandBuffer.makeComputeCommandEncoder() {
+            commandEncoder.setComputePipelineState(pipeline)
+            commandEncoder.setTexture(provider1, index: 0)
+            commandEncoder.setTexture(provider2, index: 1)
+            commandEncoder.setTexture(selector, index: 2)
+            commandEncoder.setTexture(internalTexture, index: 3)
+
+            // Encode the uniform buffer
+            configureArgumentTableWithCommandEncoder(commandEncoder)
+            commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
+            commandEncoder.endEncoding()
+
+            commandBuffer.commit()
+            commandBuffer.waitUntilCompleted()
+            dirty = false
+        }
     }
-    if internalTexture!.width != textureWidth || internalTexture!.height != textureHeight{
-      newInternalTexture()
-    }
-    
-    let threadGroupsCount = MTLSizeMake(8, 8, 1)
-    let threadGroups = MTLSizeMake(textureWidth / threadGroupsCount.width, textureHeight / threadGroupsCount.height, 1)
-    
-    let commandBuffer = context.commandQueue.makeCommandBuffer()
-    
-    let commandEncoder = commandBuffer!.makeComputeCommandEncoder()
-    commandEncoder!.setComputePipelineState(pipeline)
-    commandEncoder!.setTexture(provider1, index: 0)
-    commandEncoder!.setTexture(provider2, index: 1)
-    commandEncoder!.setTexture(selector, index: 2)
-    commandEncoder!.setTexture(internalTexture, index: 3)
-    
-    // Encode the uniform buffer
-    configureArgumentTableWithCommandEncoder(commandEncoder!)
-    commandEncoder!.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
-    commandEncoder!.endEncoding()
-    
-    commandBuffer!.commit()
-    commandBuffer!.waitUntilCompleted()
-    dirty = false
-  }
   
   
   

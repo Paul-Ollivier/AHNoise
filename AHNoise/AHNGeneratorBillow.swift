@@ -8,7 +8,7 @@
 
 
 import Metal
-import simd
+
 
 
 ///Generates a cohesive billow effect, useful for creating clouds. The noise created lies within the range -1.0 - 1.0 numerically [0.0 - 1.0 in colour space].

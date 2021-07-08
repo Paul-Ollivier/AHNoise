@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import simd
+
 
 
 ///Struct used to communicate properties to the GPU.

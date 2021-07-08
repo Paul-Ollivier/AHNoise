@@ -8,7 +8,7 @@
 
 
 import Metal
-import simd
+
 
 
 /**
@@ -99,13 +99,13 @@ open class AHNModifierSwirl: AHNModifier {
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
   open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = vector_float4(xAnchor, yAnchor, intensity, cutEdges ? 1 : 0)
+    var uniforms = Float4(xAnchor, yAnchor, intensity, cutEdges ? 1 : 0)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float4>.stride, options: MTLResourceOptions())
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<Float4>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float4>.stride)
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<Float4>.stride)
     
     commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }

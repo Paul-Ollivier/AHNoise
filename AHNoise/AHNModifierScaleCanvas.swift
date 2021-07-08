@@ -9,13 +9,13 @@
 
 // import UIKit
 import Metal
-import simd
+
 
 
 ///The struct used to encode user defined properties (uniforms) to the GPU.
 struct AHNScaleCanvasProperties{
-  var scale: vector_float4
-  var oldSize: vector_int4
+  var scale: Float4
+  var oldSize: Int4
 }
 
 
@@ -138,7 +138,7 @@ open class AHNModifierScaleCanvas: NSObject, AHNTextureProvider {
   // MARK:- Initialiser
   
   
-  override public required init(){
+  override public required init() {
     context = AHNContext.SharedContext
     let functionName = "scaleCanvasModifier"
     
@@ -165,21 +165,25 @@ open class AHNModifierScaleCanvas: NSObject, AHNTextureProvider {
   
   
   
-  // MARK:- Argument table update
-  
-  
-  ///Encodes the required uniform values for this `AHNModifier`. This should never be called directly.
-  open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = AHNScaleCanvasProperties(scale: vector_float4(xAnchor, yAnchor, xScale, yScale), oldSize: vector_int4(Int32(provider!.textureSize().width), Int32(provider!.textureSize().height),0,0))
+    // MARK:- Argument table update
+
+
+    ///Encodes the required uniform values for this `AHNModifier`. This should never be called directly.
+    open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     
-    if uniformBuffer == nil{
-      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<AHNScaleCanvasProperties>.stride, options: MTLResourceOptions())
+        var uniforms = AHNScaleCanvasProperties(
+            scale: Float4(xAnchor, yAnchor, xScale, yScale),
+            oldSize: Int4(Int(provider!.textureSize().width), Int(provider!.textureSize().height), 0, 0)
+        )
+
+        if uniformBuffer == nil {
+            uniformBuffer = context.device.makeBuffer(length: MemoryLayout<AHNScaleCanvasProperties>.stride, options: MTLResourceOptions())
+        }
+
+        memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<AHNScaleCanvasProperties>.stride)
+
+        commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
     }
-    
-    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<AHNScaleCanvasProperties>.stride)
-    
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
-  }
   
   
   

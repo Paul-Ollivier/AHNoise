@@ -8,7 +8,7 @@
 
 
 import Metal
-import simd
+
 
 
 ///Generates standard Simplex Noise. The noise created lies within the range `0.0 - 1.0`.

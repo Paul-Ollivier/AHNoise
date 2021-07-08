@@ -9,7 +9,7 @@
 
 // import UIKit
 import Metal
-import simd
+
 
 
 /**
@@ -95,12 +95,12 @@ open class AHNContext: NSObject {
    - parameter device: (Optional) The `MTLDevice` used throughout the `AHNoise` framework..
    */
   private init(device: MTLDevice?) {
-    guard let device = device else{
+    guard let device = device else {
       fatalError("AHNoise: Error creating MTLDevice).")
     }
     self.device = device
     
-    guard let library = device.makeDefaultLibrary() else{
+    guard let library = device.makeDefaultLibrary() else {
       fatalError("AHNoise: Error creating default library.")
     }
     self.library = library

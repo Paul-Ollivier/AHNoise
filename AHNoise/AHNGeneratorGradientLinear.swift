@@ -7,12 +7,12 @@
 //
 
 import UIKit
-import simd
+
 
 
 ///Struct used to communicate properties to the GPU.
 struct GradientInputs {
-  var positions: vector_float4
+  var positions: Float4
   var offsetStrength: Float
   var rotations: Float3
 }
@@ -97,7 +97,7 @@ open class AHNGeneratorGradientLinear: AHNGenerator {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = GradientInputs(positions: vector_float4(startPositionX, startPositionY, endPositionX, endPositionY), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
+    var uniforms = GradientInputs(positions: Float4(startPositionX, startPositionY, endPositionX, endPositionY), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GradientInputs>.stride, options: .storageModeShared)

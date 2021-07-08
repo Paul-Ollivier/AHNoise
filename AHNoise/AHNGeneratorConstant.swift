@@ -8,7 +8,7 @@
 
 
 import Metal
-import simd
+
 
 
 ///Generates a solid colour based on red, green and blue colour values. Can be used to colourise other noise modules.

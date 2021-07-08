@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import simd
+
 
 
 ///Generates a box gradient texture comprising four linear gradients originating from the four texture edges.
@@ -74,7 +74,7 @@ open class AHNGeneratorGradientBox: AHNGenerator {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = GradientInputs(positions: vector_float4(xFallOff, yFallOff, 0, 0), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
+    var uniforms = GradientInputs(positions: Float4(xFallOff, yFallOff, 0, 0), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GradientInputs>.stride, options: .storageModeShared)

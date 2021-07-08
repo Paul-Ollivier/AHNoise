@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import simd
+
 
 
 ///Generates a radial gradient texture originating from a control point.
@@ -91,7 +91,7 @@ open class AHNGeneratorGradientRadial: AHNGenerator {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = GradientInputs(positions: vector_float4(xPosition, yPosition, xFallOff, yFallOff), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
+    var uniforms = GradientInputs(positions: Float4(xPosition, yPosition, xFallOff, yFallOff), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GradientInputs>.stride, options: .storageModeShared)

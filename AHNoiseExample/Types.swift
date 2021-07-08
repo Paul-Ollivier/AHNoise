@@ -8,6 +8,7 @@
 import Foundation
 
 typealias Int2 = SIMD2<Int>
+typealias Int4 = SIMD4<Int>
 
 typealias Float2 = SIMD2<Float>
 typealias Float3 = SIMD3<Float>
