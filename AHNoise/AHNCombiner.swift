@@ -241,19 +241,19 @@ open class AHNCombiner: NSObject, AHNTextureProvider {
     
     let commandBuffer = context.commandQueue.makeCommandBuffer()
     
-    let commandEncoder = commandBuffer.makeComputeCommandEncoder()
-    commandEncoder.setComputePipelineState(pipeline)
-    commandEncoder.setTexture(provider1, at: 0)
-    commandEncoder.setTexture(provider2, at: 1)
-    commandEncoder.setTexture(internalTexture, at: 2)
+    let commandEncoder = commandBuffer!.makeComputeCommandEncoder()
+    commandEncoder!.setComputePipelineState(pipeline)
+    commandEncoder!.setTexture(provider1, index: 0)
+    commandEncoder!.setTexture(provider2, index: 1)
+    commandEncoder!.setTexture(internalTexture, index: 2)
     
     // Encode the uniform buffer
-    configureArgumentTableWithCommandencoder(commandEncoder)
-    commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
-    commandEncoder.endEncoding()
+    configureArgumentTableWithCommandencoder(commandEncoder!)
+    commandEncoder!.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
+    commandEncoder!.endEncoding()
     
-    commandBuffer.commit()
-    commandBuffer.waitUntilCompleted()
+    commandBuffer!.commit()
+    commandBuffer!.waitUntilCompleted()
     dirty = false
   }
   
@@ -261,7 +261,10 @@ open class AHNCombiner: NSObject, AHNTextureProvider {
   
   ///Create a new `internalTexture` for the first time or whenever the texture is resized.
   fileprivate func newInternalTexture(){
+      print("AHN :: create NEW internal texture")
     let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
+    textureDescriptor.usage = [.shaderRead, .shaderWrite]
+    
     internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
   }
 

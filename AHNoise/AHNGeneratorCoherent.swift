@@ -7,7 +7,7 @@
 //
 
 
-import UIKit
+// import UIKit
 import Metal
 import simd
 
@@ -15,8 +15,8 @@ import simd
 
 ///Struct used to communicate properties to the GPU.
 struct CoherentInputs {
-  var pos: vector_float2
-  var rotations: vector_float3
+  var pos: Float2
+  var rotations: Float3
   var octaves: Int32
   var persistence: Float
   var frequency: Float
@@ -172,35 +172,31 @@ open class AHNGeneratorCoherent: AHNGenerator {
       dirty = true
     }
   }
+  
+  
+  
+  
+  
+  
+    // MARK:- Initialiser
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  // MARK:- Initialiser
-  
-  
-  /**
-   Creates a new `AHNGeneratorCoherent` object.
-   
-   To be called when instantiating a subclass.
-   
-   - parameter functionName: The name of the kernel function that this this generator will use to create an output.
-   */
-  public override init(functionName: String){
-    super.init(functionName: functionName)
-  }
-  
-  
-  
-  public required init() {
-    super.init()
-  }
+
+    /**
+    Creates a new `AHNGeneratorCoherent` object.
+
+    To be called when instantiating a subclass.
+
+    - parameter functionName: The name of the kernel function that this this generator will use to create an output.
+    */
+    public override init(functionName: String, hasDisplacement: Bool) {
+        super.init(functionName: functionName, hasDisplacement: hasDisplacement)
+    }
+
+
+
+    public required init() {
+        super.init()
+    }
   
   
   
@@ -211,9 +207,9 @@ open class AHNGeneratorCoherent: AHNGenerator {
   
   // MARK:- Array buffer binding
   open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    commandEncoder.setBuffer(context.grad3Buffer, offset: 0, at: 0)
-    commandEncoder.setBuffer(context.grad4Buffer, offset: 0, at: 1)
-    commandEncoder.setBuffer(context.permBuffer, offset: 0, at: 2)
-    commandEncoder.setBuffer(context.permMod12Buffer, offset: 0, at: 3)
+    commandEncoder.setBuffer(context.grad3Buffer, offset: 0, index: 0)
+    commandEncoder.setBuffer(context.grad4Buffer, offset: 0, index: 1)
+    commandEncoder.setBuffer(context.permBuffer, offset: 0, index: 2)
+    commandEncoder.setBuffer(context.permMod12Buffer, offset: 0, index: 3)
   }
 }

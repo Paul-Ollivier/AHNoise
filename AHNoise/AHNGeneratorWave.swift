@@ -14,7 +14,7 @@ import simd
 struct WaveInputs {
   var frequency: Float
   var offsetStrength: Float
-  var rotations: vector_float3
+  var rotations: Float3
 }
 
 
@@ -47,7 +47,7 @@ open class AHNGeneratorWave: AHNGenerator  {
   // MARK:- Initialiser
   
   required public init(){
-    super.init(functionName: "waveGenerator")
+      super.init(functionName: "waveGenerator", hasDisplacement: true)
   }
   
   
@@ -68,7 +68,7 @@ open class AHNGeneratorWave: AHNGenerator  {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = WaveInputs(frequency: frequency, offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
+    var uniforms = WaveInputs(frequency: frequency, offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
 
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<WaveInputs>.stride, options: .storageModeShared)
@@ -76,6 +76,6 @@ open class AHNGeneratorWave: AHNGenerator  {
     
     memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<WaveInputs>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }  
 }

@@ -79,17 +79,17 @@ open class AHNSelectorSelect: AHNSelector {
   
   ///Encodes the required uniform values for this `AHNSelector` subclass. This should never be called directly.
   open override func configureArgumentTableWithCommandEncoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = vector_float2(transition, boundary)
+    var uniforms = Float2(transition, boundary)
     
     // Create the uniform buffer
     if uniformBuffer == nil{
-      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float2>.stride, options: MTLResourceOptions())
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<Float2>.stride, options: MTLResourceOptions())
     }
     
     // Copy latest arguments
-    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float2>.stride)
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<Float2>.stride)
     
     // Set the buffer in the argument table
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }
 }

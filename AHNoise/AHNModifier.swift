@@ -111,6 +111,7 @@ open class AHNModifier: NSObject, AHNTextureProvider {
    - parameter functionName: The name of the kernel function that this modifier will use to modify the input.
    */
   init(functionName: String) {
+      print("AHNModifier :: init functionName = ", functionName)
     context = AHNContext.SharedContext
     
     guard let kernelFunction = context.library.makeFunction(name: functionName) else{
@@ -199,47 +200,56 @@ open class AHNModifier: NSObject, AHNTextureProvider {
    
    This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current properties.
    */
-  open func updateTexture(){
+    open func updateTexture() {
 
-    if provider?.texture() == nil {return}
-    
-    if internalTexture == nil{
-      newInternalTexture()
+        if provider?.texture() == nil { return }
+        print("AHNModifier :: updateTexture")
+
+        if internalTexture == nil {
+            newInternalTexture()
+        }
+        if internalTexture!.width != width || internalTexture!.height != height {
+            newInternalTexture()
+        }
+
+        let threadGroupsCount = MTLSizeMake(8, 8, 1)
+        let threadGroups = MTLSizeMake(width / threadGroupsCount.width, height / threadGroupsCount.height, 1)
+
+        if let commandBuffer = context.commandQueue.makeCommandBuffer() {
+
+            // If an MPS is being used, encode it to the command buffer, else create a command encoder for a custom kernel
+            if usesMPS {
+                addMetalPerformanceShaderToBuffer(commandBuffer)
+            } else {
+                if let commandEncoder = commandBuffer.makeComputeCommandEncoder() {
+                    commandEncoder.setComputePipelineState(pipeline)
+                    commandEncoder.setTexture(provider!.texture(), index: 0)
+                    commandEncoder.setTexture(internalTexture, index: 1)
+                    configureArgumentTableWithCommandencoder(commandEncoder)
+                    commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
+                    commandEncoder.endEncoding()
+                }
+            }
+
+            commandBuffer.commit()
+            commandBuffer.waitUntilCompleted()
+            dirty = false
+        }
     }
-    if internalTexture!.width != width || internalTexture!.height != height{
-      newInternalTexture()
-    }
-    
-    let threadGroupsCount = MTLSizeMake(8, 8, 1)
-    let threadGroups = MTLSizeMake(width / threadGroupsCount.width, height / threadGroupsCount.height, 1)
-    
-    let commandBuffer = context.commandQueue.makeCommandBuffer()
-    
-    // If an MPS is being used, encode it to the command buffer, else create a command encoder for a custom kernel
-    if usesMPS{
-      addMetalPerformanceShaderToBuffer(commandBuffer)
-    }else{
-      let commandEncoder = commandBuffer.makeComputeCommandEncoder()
-      commandEncoder.setComputePipelineState(pipeline)
-      commandEncoder.setTexture(provider!.texture(), at: 0)
-      commandEncoder.setTexture(internalTexture, at: 1)
-      configureArgumentTableWithCommandencoder(commandEncoder)
-      commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
-      commandEncoder.endEncoding()
-    }
-    
-    commandBuffer.commit()
-    commandBuffer.waitUntilCompleted()
-    dirty = false
-  }
   
   
   
-  ///Create a new `internalTexture` for the first time or whenever the texture is resized.
-  func newInternalTexture(){
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: width, height: height, mipmapped: false)
-    internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
-  }
+    ///Create a new `internalTexture` for the first time or whenever the texture is resized.
+    
+    func newInternalTexture() {
+        
+        print("AHNModifier :: newInternalTexture")
+        
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: width, height: height, mipmapped: false)
+        textureDescriptor.usage = [.shaderRead, .shaderWrite]
+
+        internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
+    }
   
   
   

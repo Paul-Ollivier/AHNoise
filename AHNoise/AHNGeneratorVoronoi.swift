@@ -12,9 +12,9 @@ import simd
 
 ///Struct used to communicate properties to the GPU.
 struct VoronoiInputs {
-  var pos: vector_float2
+  var pos: SIMD2<Float>
   var offsetStrength: Float
-  var rotations: vector_float3
+  var rotations: SIMD3<Float>
   var octaves: Int32
   var persistence: Float
   var frequency: Float
@@ -36,7 +36,7 @@ open class AHNGeneratorVoronoi: AHNGeneratorCoherent {
   
   
   required public init(){
-    super.init(functionName: "voronoiGenerator")
+      super.init(functionName: "voronoiGenerator", hasDisplacement: true)
     octaves = 1
   }
   
@@ -60,11 +60,11 @@ open class AHNGeneratorVoronoi: AHNGeneratorCoherent {
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
     super.configureArgumentTableWithCommandencoder(commandEncoder)
-    var uniforms = VoronoiInputs(pos: vector_float2(xValue, yValue), offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation), octaves: Int32(octaves), persistence: persistence, frequency: frequency, lacunarity: lacunarity, zValue: zValue, wValue: wValue, sphereMap: sphereMap ? 1 : 0, seamless: seamless ? 1 : 0)
+    var uniforms = VoronoiInputs(pos: Float2(xValue, yValue), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation), octaves: Int32(octaves), persistence: persistence, frequency: frequency, lacunarity: lacunarity, zValue: zValue, wValue: wValue, sphereMap: sphereMap ? 1 : 0, seamless: seamless ? 1 : 0)
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<VoronoiInputs>.stride, options: .storageModeShared)
     }
     memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<VoronoiInputs>.stride)
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 4)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 4)
   }
 }

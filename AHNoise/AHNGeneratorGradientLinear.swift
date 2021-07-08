@@ -14,7 +14,7 @@ import simd
 struct GradientInputs {
   var positions: vector_float4
   var offsetStrength: Float
-  var rotations: vector_float3
+  var rotations: Float3
 }
 
 
@@ -76,7 +76,7 @@ open class AHNGeneratorGradientLinear: AHNGenerator {
   
   
   required public init(){
-    super.init(functionName: "linearGradientGenerator")
+      super.init(functionName: "linearGradientGenerator", hasDisplacement: true)
   }
   
   
@@ -97,7 +97,7 @@ open class AHNGeneratorGradientLinear: AHNGenerator {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = GradientInputs(positions: vector_float4(startPositionX, startPositionY, endPositionX, endPositionY), offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
+    var uniforms = GradientInputs(positions: vector_float4(startPositionX, startPositionY, endPositionX, endPositionY), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GradientInputs>.stride, options: .storageModeShared)
@@ -105,6 +105,6 @@ open class AHNGeneratorGradientLinear: AHNGenerator {
     
     memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<GradientInputs>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }
 }

@@ -17,7 +17,7 @@ import simd
 
 
 ///Implemented by classes that output an `MTLTexture`. Provides references to textures and helper functions.
-public protocol AHNTextureProvider: class{
+public protocol AHNTextureProvider: AnyObject {
   
   
   /**

@@ -7,7 +7,6 @@
 //
 
 import Metal
-import simd
 import MetalPerformanceShaders
 
 
@@ -25,8 +24,8 @@ open class AHNModifierBlur: AHNModifier {
   
   
   ///The radius of the Gaussian blur. The default value is `3.0`.
-  open var radius: Float = 3{
-    didSet{
+  open var radius: Float = 3 {
+    didSet {
       dirty = true
     }
   }
@@ -50,7 +49,7 @@ open class AHNModifierBlur: AHNModifier {
   // MARK:- Initialiser
   
   
-  required public init(){
+  required public init() {
     super.init(functionName: "normalMapModifier")
     usesMPS = true
     kernel = MPSImageGaussianBlur(device: context.device, sigma: radius)

@@ -53,7 +53,7 @@ open class AHNGeneratorGradientBox: AHNGenerator {
   
   
   required public init(){
-    super.init(functionName: "boxGradientGenerator")
+      super.init(functionName: "boxGradientGenerator", hasDisplacement: true)
   }
   
   
@@ -74,7 +74,7 @@ open class AHNGeneratorGradientBox: AHNGenerator {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = GradientInputs(positions: vector_float4(xFallOff, yFallOff, 0, 0), offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
+    var uniforms = GradientInputs(positions: vector_float4(xFallOff, yFallOff, 0, 0), offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GradientInputs>.stride, options: .storageModeShared)
@@ -82,6 +82,6 @@ open class AHNGeneratorGradientBox: AHNGenerator {
     
     memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<GradientInputs>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }
 }

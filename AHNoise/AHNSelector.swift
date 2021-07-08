@@ -244,20 +244,20 @@ open class AHNSelector: NSObject, AHNTextureProvider{
     
     let commandBuffer = context.commandQueue.makeCommandBuffer()
     
-    let commandEncoder = commandBuffer.makeComputeCommandEncoder()
-    commandEncoder.setComputePipelineState(pipeline)
-    commandEncoder.setTexture(provider1, at: 0)
-    commandEncoder.setTexture(provider2, at: 1)
-    commandEncoder.setTexture(selector, at: 2)
-    commandEncoder.setTexture(internalTexture, at: 3)
+    let commandEncoder = commandBuffer!.makeComputeCommandEncoder()
+    commandEncoder!.setComputePipelineState(pipeline)
+    commandEncoder!.setTexture(provider1, index: 0)
+    commandEncoder!.setTexture(provider2, index: 1)
+    commandEncoder!.setTexture(selector, index: 2)
+    commandEncoder!.setTexture(internalTexture, index: 3)
     
     // Encode the uniform buffer
-    configureArgumentTableWithCommandEncoder(commandEncoder)
-    commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
-    commandEncoder.endEncoding()
+    configureArgumentTableWithCommandEncoder(commandEncoder!)
+    commandEncoder!.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
+    commandEncoder!.endEncoding()
     
-    commandBuffer.commit()
-    commandBuffer.waitUntilCompleted()
+    commandBuffer!.commit()
+    commandBuffer!.waitUntilCompleted()
     dirty = false
   }
   
@@ -266,6 +266,8 @@ open class AHNSelector: NSObject, AHNTextureProvider{
   ///Create a new `internalTexture` for the first time or whenever the texture is resized.
   func newInternalTexture(){
     let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
+    textureDescriptor.usage = [.shaderRead, .shaderWrite]
+    
     internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
   }
   

@@ -59,7 +59,7 @@ open class AHNGeneratorConstant: AHNGenerator {
   
   
   required public init(){
-    super.init(functionName: "uniformGenerator")
+      super.init(functionName: "uniformGenerator", hasDisplacement: true)
   }
   
   
@@ -72,14 +72,14 @@ open class AHNGeneratorConstant: AHNGenerator {
   
   // Argument table update
   open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = vector_float3(red,green,blue)
+    var uniforms = Float3(red,green,blue)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float3>.stride, options: .storageModeShared)
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<Float3>.stride, options: .storageModeShared)
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float3>.stride)
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<Float3>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }
 }

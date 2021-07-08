@@ -18,7 +18,7 @@ internal struct GeometricInputs{
   var yPosition: Float
   var zValue: Float
   var offsetStrength: Float
-  var rotations: vector_float3
+  var rotations: Float3
 }
 
 
@@ -94,7 +94,7 @@ open class AHNGeneratorCylinder: AHNGenerator {
   
   
   required public init(){
-    super.init(functionName: "cylinderGenerator")
+      super.init(functionName: "cylinderGenerator", hasDisplacement: true)
   }
   
   
@@ -115,7 +115,7 @@ open class AHNGeneratorCylinder: AHNGenerator {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = GeometricInputs(offset: offset, frequency: frequency, xPosition: xPosition, yPosition: yPosition, zValue: zValue, offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
+    var uniforms = GeometricInputs(offset: offset, frequency: frequency, xPosition: xPosition, yPosition: yPosition, zValue: zValue, offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GeometricInputs>.stride, options: .storageModeShared)
@@ -123,6 +123,6 @@ open class AHNGeneratorCylinder: AHNGenerator {
     
     memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<GeometricInputs>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }
 }

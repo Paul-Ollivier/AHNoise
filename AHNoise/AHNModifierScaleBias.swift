@@ -84,14 +84,14 @@ open class AHNModifierScaleBias: AHNModifier {
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
   open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = vector_float2(scale, bias)
+    var uniforms = Float2(scale, bias)
     
     if uniformBuffer == nil{
-      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<vector_float2>.stride, options: MTLResourceOptions())
+      uniformBuffer = context.device.makeBuffer(length: MemoryLayout<Float2>.stride, options: MTLResourceOptions())
     }
     
-    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<vector_float2>.stride)
+    memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<Float2>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }
 }

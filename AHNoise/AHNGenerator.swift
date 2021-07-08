@@ -116,7 +116,7 @@ open class AHNGenerator: NSObject, AHNTextureProvider {
   /**
    The width of the output `MTLTexure` in pixels. The default value is `128`.
    */
-  open var textureWidth: Int = 128{
+  open var textureWidth: Int = 128 {
     didSet{
       dirty = true
     }
@@ -127,63 +127,74 @@ open class AHNGenerator: NSObject, AHNTextureProvider {
   /**
    The height of the output `MTLTexure` in pixels. The default value is `128`.
    */
-  open var textureHeight: Int = 128{
+  open var textureHeight: Int = 128 {
     didSet{
       dirty = true
     }
   }
   
-  
-  
-  
-  
-  
-  
-  
-  // MARK:- Inititalisers
-  
-  
-  /**
-   Creates a new `AHNGenerator` object.
-   
-   To be called when instantiating a subclass.
-   
-   - parameter functionName: The name of the kernel function that this generator will use to create an output.
-   */
-  public init(functionName: String){
-    context = AHNContext.SharedContext
-    guard let kernelFunction = context.library.makeFunction(name: functionName) else{
-      fatalError("AHNoise: Error loading function \(functionName).")
-    }
-    self.kernelFunction = kernelFunction
     
-    do{
-      try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
-    }catch let error{
-      fatalError("AHNoise: Error creating pipeline state for \(functionName).\n\(error)")
-    }
-    dirty = true
-    super.init()
-  }
+    public var hasDisplacement = false
   
   
   
-  override public required init(){
-    context = AHNContext.SharedContext
-    // Load the kernel function and compute pipeline state
-    guard let kernelFunction = context.library.makeFunction(name: "simplexGenerator") else{
-      fatalError("AHNoise: Error loading function simplexGenerator.")
-    }
-    self.kernelFunction = kernelFunction
+  
+  
+  
+    // MARK:- Inititalisers
+  
+  
+    /**
+    Creates a new `AHNGenerator` object.
+
+    To be called when instantiating a subclass.
+
+    - parameter functionName: The name of the kernel function that this generator will use to create an output.
+    */
     
-    do{
-      try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
-    }catch let error{
-      fatalError("AHNoise: Error creating pipeline state for simplexGenerator.\n\(error)")
+    public init(functionName: String, hasDisplacement: Bool) {
+        
+        print("AHNGenerator :: init functionName = ", functionName)
+        
+        self.hasDisplacement = hasDisplacement
+        
+        context = AHNContext.SharedContext
+        guard let kernelFunction = context.library.makeFunction(name: functionName) else {
+            fatalError("AHNoise: Error loading function \(functionName).")
+        }
+        
+        self.kernelFunction = kernelFunction
+        
+        do {
+            try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
+        } catch let error {
+            fatalError("AHNoise: Error creating pipeline state for \(functionName).\n\(error)")
+        }
+        dirty = true
+        super.init()
     }
-    
-    super.init()
-  }
+  
+  
+  
+    override public required init() {
+        
+        context = AHNContext.SharedContext
+        
+        // Load the kernel function and compute pipeline state
+        guard let kernelFunction = context.library.makeFunction(name: "simplexGenerator") else {
+            fatalError("AHNoise: Error loading function simplexGenerator.")
+        }
+        
+        self.kernelFunction = kernelFunction
+
+        do{
+            try pipeline = context.device.makeComputePipelineState(function: kernelFunction)
+        } catch let error {
+            fatalError("AHNoise: Error creating pipeline state for simplexGenerator.\n\(error)")
+        }
+
+        super.init()
+    }
   
   
   
@@ -225,52 +236,75 @@ open class AHNGenerator: NSObject, AHNTextureProvider {
    
    This should not need to be called manually as it is called by the `texture()` method automatically if the texture does not represent the current properties.
    */
-  open func updateTexture(){
-    if internalTexture == nil{
-      newInternalTexture()
+    open func updateTexture() {
+        
+        print("AHNGenerator :: updateTexture")
+        
+        if internalTexture == nil {
+            newInternalTexture()
+        }
+        
+        if internalTexture!.width != textureWidth || internalTexture!.height != textureHeight {
+            newInternalTexture()
+        }
+
+        let threadGroupsCount = MTLSizeMake(8, 8, 1)
+        let threadGroups = MTLSizeMake(textureWidth / threadGroupsCount.width, textureHeight / threadGroupsCount.height, 1)
+
+        if let commandBuffer = context.commandQueue.makeCommandBuffer(),
+           let commandEncoder = commandBuffer.makeComputeCommandEncoder() {
+            
+            commandEncoder.setComputePipelineState(pipeline)
+            commandEncoder.setTexture(internalTexture, index: 0)
+            
+            if hasDisplacement {
+                commandEncoder.setTexture(xoffsetInput?.texture() ?? defaultDisplaceTexture!, index: 1)
+                commandEncoder.setTexture(yoffsetInput?.texture() ?? defaultDisplaceTexture!, index: 2)
+            }
+
+            configureArgumentTableWithCommandencoder(commandEncoder)
+            commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
+            commandEncoder.endEncoding()
+
+            commandBuffer.commit()
+            commandBuffer.waitUntilCompleted()
+
+            dirty = false
+        }
     }
-    if internalTexture!.width != textureWidth || internalTexture!.height != textureHeight{
-      newInternalTexture()
-    }
-    
-    let threadGroupsCount = MTLSizeMake(8, 8, 1)
-    let threadGroups = MTLSizeMake(textureWidth / threadGroupsCount.width, textureHeight / threadGroupsCount.height, 1)
-    
-    let commandBuffer = context.commandQueue.makeCommandBuffer()
-    
-    let commandEncoder = commandBuffer.makeComputeCommandEncoder()
-    commandEncoder.setComputePipelineState(pipeline)
-    commandEncoder.setTexture(internalTexture, at: 0)
-    commandEncoder.setTexture(xoffsetInput?.texture() ?? defaultDisplaceTexture!, at: 1)
-    commandEncoder.setTexture(yoffsetInput?.texture() ?? defaultDisplaceTexture!, at: 2)
-    
-    configureArgumentTableWithCommandencoder(commandEncoder)
-    commandEncoder.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadGroupsCount)
-    commandEncoder.endEncoding()
-    
-    commandBuffer.commit()
-    commandBuffer.waitUntilCompleted()
-    
-    dirty = false
-  }
   
   
   
-  ///Create a new `internalTexture` for the first time or whenever the texture is resized.
-  func newInternalTexture(){
-    let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: textureWidth, height: textureHeight, mipmapped: false)
-    internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
+    ///Create a new `internalTexture` for the first time or whenever the texture is resized.
     
-    
-    let grey: [UInt8] = [128, 128, 128, 255]
-    var textureBytes: [UInt8] = []
-    for _ in 0..<textureWidth*textureHeight{
-      textureBytes.append(contentsOf: grey)
+    func newInternalTexture()
+    {
+        print("AHNGenerator :: newInternalTexture")
+        
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .rgba8Unorm,
+            width: textureWidth,
+            height: textureHeight,
+            mipmapped: false
+        )
+        textureDescriptor.usage = [.shaderWrite, .shaderRead]
+
+        internalTexture = context.device.makeTexture(descriptor: textureDescriptor)
+        
+        
+        if hasDisplacement {
+            defaultDisplaceTexture = context.device.makeTexture(descriptor: textureDescriptor)
+            
+            let grey: [UInt8] = [128, 128, 128, 255]
+            var textureBytes: [UInt8] = []
+            for _ in 0 ..< textureWidth * textureHeight
+            {
+                textureBytes.append(contentsOf: grey)
+            }
+
+            defaultDisplaceTexture?.replace(region: MTLRegionMake2D(0, 0, textureWidth, textureHeight), mipmapLevel: 0, withBytes: &textureBytes, bytesPerRow: 4*textureWidth)
+        }
     }
-    textureDescriptor.usage = .shaderRead
-    defaultDisplaceTexture = context.device.makeTexture(descriptor: textureDescriptor)
-    defaultDisplaceTexture?.replace(region: MTLRegionMake2D(0, 0, textureWidth, textureHeight), mipmapLevel: 0, withBytes: &textureBytes, bytesPerRow: 4*textureWidth)
-  }
   
   
   

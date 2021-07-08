@@ -14,7 +14,7 @@ import simd
 ///The struct used to encode user defined properties (uniforms) to the GPU.
 struct ClampModifierUniforms {
   var normalise: Bool
-  var clampValues: vector_float2
+  var clampValues: Float2
 }
 
 
@@ -94,7 +94,7 @@ open class AHNModifierClamp: AHNModifier {
   
   ///Encodes the required uniform values for this `AHNModifier` subclass. This should never be called directly.
   open override func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = ClampModifierUniforms(normalise: normalise, clampValues: vector_float2(minimum, maximum))
+    var uniforms = ClampModifierUniforms(normalise: normalise, clampValues: Float2(minimum, maximum))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<ClampModifierUniforms>.stride, options: MTLResourceOptions())
@@ -102,6 +102,6 @@ open class AHNModifierClamp: AHNModifier {
     
     memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<ClampModifierUniforms>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }
 }

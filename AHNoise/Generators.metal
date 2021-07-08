@@ -532,7 +532,7 @@ kernel void voronoiGenerator(texture2d<float, access::write> outTexture [[textur
 
 
 
-// MARK:- Simplex Kernels
+// MARK: Simplex Kernels
 
 struct CoherentInputs{
   float2 pos;

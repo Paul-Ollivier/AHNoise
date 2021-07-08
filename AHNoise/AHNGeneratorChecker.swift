@@ -50,7 +50,7 @@ open class AHNGeneratorChecker: AHNGenerator {
   
   
   required public init(){
-    super.init(functionName: "checkerGenerator")
+      super.init(functionName: "checkerGenerator", hasDisplacement: true)
   }
   
   
@@ -71,7 +71,7 @@ open class AHNGeneratorChecker: AHNGenerator {
   
   ///Encodes the required uniform values for this `AHNGenerator` subclass. This should never be called directly.
   override open func configureArgumentTableWithCommandencoder(_ commandEncoder: MTLComputeCommandEncoder) {
-    var uniforms = GeometricInputs(offset: 0, frequency: frequency, xPosition: 0, yPosition: 0, zValue: zValue, offsetStrength: offsetStrength, rotations: vector_float3(xRotation, yRotation, zRotation))
+    var uniforms = GeometricInputs(offset: 0, frequency: frequency, xPosition: 0, yPosition: 0, zValue: zValue, offsetStrength: offsetStrength, rotations: Float3(xRotation, yRotation, zRotation))
     
     if uniformBuffer == nil{
       uniformBuffer = context.device.makeBuffer(length: MemoryLayout<GeometricInputs>.stride, options: .storageModeShared)
@@ -79,6 +79,6 @@ open class AHNGeneratorChecker: AHNGenerator {
     
     memcpy(uniformBuffer!.contents(), &uniforms, MemoryLayout<GeometricInputs>.stride)
     
-    commandEncoder.setBuffer(uniformBuffer, offset: 0, at: 0)
+    commandEncoder.setBuffer(uniformBuffer, offset: 0, index: 0)
   }
 }
